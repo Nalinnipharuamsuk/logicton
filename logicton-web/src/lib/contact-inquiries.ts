@@ -58,7 +58,7 @@ export async function saveContactInquiry(inquiry: ContactInquiry): Promise<boole
 // Update inquiry status
 export async function updateInquiryStatus(
   id: string,
-  status: 'new' | 'read' | 'responded'
+  status: 'new' | 'read'
 ): Promise<boolean> {
   try {
     const inquiries = await getContactInquiries();
@@ -96,7 +96,6 @@ export async function getInquiryStats(): Promise<{
   total: number;
   new: number;
   read: number;
-  responded: number;
 }> {
   try {
     const inquiries = await getContactInquiries();
@@ -105,10 +104,9 @@ export async function getInquiryStats(): Promise<{
       total: inquiries.length,
       new: inquiries.filter(i => i.status === 'new').length,
       read: inquiries.filter(i => i.status === 'read').length,
-      responded: inquiries.filter(i => i.status === 'responded').length,
     };
   } catch (error) {
     console.error('Error getting inquiry stats:', error);
-    return { total: 0, new: 0, read: 0, responded: 0 };
+    return { total: 0, new: 0, read: 0 };
   }
 }

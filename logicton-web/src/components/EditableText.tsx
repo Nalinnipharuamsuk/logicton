@@ -4,6 +4,15 @@ import { useState, useRef, useEffect } from 'react';
 import { Edit, Check } from 'lucide-react';
 import { useEditMode } from '@/providers/EditModeProvider';
 
+// Global tracking using event system
+const EDITABLE_TEXT_CLICKED_EVENT = 'editable-text-clicked';
+
+declare global {
+  interface WindowEventMap {
+    [EDITABLE_TEXT_CLICKED_EVENT]: CustomEvent<string>;
+  }
+}
+
 interface EditableTextProps {
   value: string;
   path: string; // Unique path for this field (e.g., 'home.hero.title')
@@ -29,6 +38,7 @@ export function EditableText({
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const [hasUnsavedChange, setHasUnsavedChange] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -39,12 +49,38 @@ export function EditableText({
     }
   }, [value, isEditing]);
 
+  // Listen for clicks on other EditableText components
+  useEffect(() => {
+    const handleOtherClicked = (e: CustomEvent<string>) => {
+      const clickedPath = e.detail;
+      // If another EditableText was clicked, always reset our states
+      if (clickedPath !== path) {
+        setIsEditing(false);
+        setHasUnsavedChange(false);
+        setIsHovered(false); // Always reset hover when another is clicked
+        setEditValue(value);
+      }
+    };
+
+    window.addEventListener(EDITABLE_TEXT_CLICKED_EVENT, handleOtherClicked as EventListener);
+    return () => {
+      window.removeEventListener(EDITABLE_TEXT_CLICKED_EVENT, handleOtherClicked as EventListener);
+    };
+  }, [path, value]);
+
   // Check if this field has pending changes
   const pendingChange = pendingChanges.get(path);
   const isChanged = pendingChange?.value !== value;
 
   const handleClick = () => {
     if (isEditMode) {
+      // Reset all states first
+      setIsHovered(false);
+
+      // Dispatch event to notify other EditableText components to close
+      window.dispatchEvent(new CustomEvent(EDITABLE_TEXT_CLICKED_EVENT, { detail: path }));
+
+      // Then open this editor
       setIsEditing(true);
       setTimeout(() => {
         if (type === 'paragraph' && textareaRef.current) {
@@ -165,20 +201,33 @@ export function EditableText({
   return (
     <span
       onClick={handleClick}
-      className={`group relative ${showEditBorder || showEditIcon ? 'cursor-pointer' : ''} ${wrapperClass}`}
+      className={`relative z-10 ${wrapperClass}`}
+      style={{
+        cursor: isEditMode ? 'pointer' : 'default',
+        padding: isEditMode ? '4px' : '0',
+        margin: isEditMode ? '-4px' : '0',
+        border: isEditMode && isHovered ? '2px solid #60a5fa' : (isEditMode ? '2px solid transparent' : 'none'),
+        borderRadius: '4px',
+        transition: 'border-color 0.2s ease',
+        display: 'inline-block'
+      }}
+      onMouseEnter={() => isEditMode && setIsHovered(true)}
+      onMouseLeave={() => isEditMode && setIsHovered(false)}
     >
-      {showEditBorder ? (
-        <span className="border-2 border-transparent group-hover:border-blue-400 group-hover:rounded p-1 -m-1 transition-all rounded inline-block">
-          <Tag className={className}>{value}</Tag>
-        </span>
-      ) : (
-        <Tag className={className}>{value}</Tag>
-      )}
-      {showEditIcon && (
-        <span className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-          <span className="bg-blue-600 text-white p-1.5 rounded-full shadow-lg inline-block">
-            <Edit className="h-3 w-3" />
-          </span>
+      <Tag className={className}>{value}</Tag>
+      {isEditMode && isHovered && (
+        <span style={{
+          position: 'absolute',
+          top: '-8px',
+          right: '-8px',
+          backgroundColor: '#2563eb',
+          color: 'white',
+          padding: '6px',
+          borderRadius: '50%',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          zIndex: 10,
+        }}>
+          <Edit style={{ width: '12px', height: '12px' }} />
         </span>
       )}
     </span>

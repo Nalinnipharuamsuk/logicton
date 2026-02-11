@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
+// Use environment variables for DB config
 const dbConfig = {
-  host: 'localhost',
-  port: 3306,
-  user: 'myuser',
-  password: 'mypassword',
-  database: 'mydatabase'
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: parseInt(process.env.MYSQL_PORT || '3306'),
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 };
 
 interface InlineEditChange {
@@ -18,6 +21,12 @@ interface InlineEditChange {
 export async function POST(request: Request) {
   let connection;
   try {
+    // 1. Require Authentication
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { changes }: { changes: InlineEditChange[] } = await request.json();
 
     if (!changes || changes.length === 0) {

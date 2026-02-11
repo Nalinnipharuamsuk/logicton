@@ -1,20 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import mysql from 'mysql2/promise';
 import { CompanyInfo, TeamMember, Service, PortfolioItem, SiteConfig } from '@/types';
 import {
   companyInfoSchema,
   servicesPayloadSchema,
   portfolioPayloadSchema
 } from '@/lib/validation';
-
-// Database connection
-const dbConfig = {
-  host: 'localhost',
-  user: 'myuser',
-  password: 'mypassword',
-  database: 'mydatabase',
-};
 
 // Use content directory relative to project root
 const CONTENT_PATH = './content';

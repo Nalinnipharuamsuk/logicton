@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
+// Use environment variables for DB config
 const dbConfig = {
-  host: 'localhost',
-  port: 3306,
-  user: 'myuser',
-  password: 'mypassword',
-  database: 'mydatabase'
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: parseInt(process.env.MYSQL_PORT || '3306'),
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 };
 
 export async function GET() {
@@ -16,10 +19,10 @@ export async function GET() {
       'SELECT * FROM PortfolioItem ORDER BY completedDate DESC'
     );
     await connection.end();
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = rows as any[];
-    
+
     // Format data to match expected structure
     const formattedData = data.map(item => ({
       id: item.id,
@@ -43,7 +46,7 @@ export async function GET() {
       featured: item.featured,
       isActive: item.isActive
     }));
-    
+
     return NextResponse.json({ success: true, data: formattedData }, {
       headers: {
         'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
@@ -61,8 +64,13 @@ export async function GET() {
 // POST - Create new portfolio item
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
-    
+
     // Validate required fields
     if (!body.title || !body.title.en || !body.title.th || !body.client) {
       return NextResponse.json(
@@ -70,7 +78,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    
+
     const connection = await mysql.createConnection(dbConfig);
     const id = `portfolio_${Date.now()}`;
     await connection.execute(
@@ -94,7 +102,7 @@ export async function POST(request: Request) {
       ]
     );
     await connection.end();
-    
+
     return NextResponse.json({ success: true, data: { id } }, { status: 201 });
   } catch (error) {
     console.error('Failed to create portfolio item:', error);

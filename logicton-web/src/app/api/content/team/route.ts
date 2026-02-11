@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTeamMembers, updateTeamMembers, generateId } from '@/lib/content';
 import type { TeamMember, ApiResponse } from '@/types';
 import { teamPayloadSchema } from '@/lib/validation';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {
     const data = await getTeamMembers();
-    
+
     return NextResponse.json<ApiResponse>({ success: true, data }, {
       headers: {
         'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=900'
@@ -22,9 +24,14 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const currentMembers = await getTeamMembers();
-    
+
     // Create new team member
     const newMember: TeamMember = {
       id: generateId('team'),
@@ -41,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Validate
     const members = [...currentMembers, newMember];
     const parsed = teamPayloadSchema.safeParse({ members });
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: 'Invalid data format' },
@@ -51,10 +58,10 @@ export async function POST(request: NextRequest) {
 
     // Save
     const success = await updateTeamMembers(members);
-    
+
     if (success) {
-      return NextResponse.json<ApiResponse>({ 
-        success: true, 
+      return NextResponse.json<ApiResponse>({
+        success: true,
         data: newMember,
         message: 'Team member added successfully'
       }, { status: 201 });
@@ -75,12 +82,17 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const currentMembers = await getTeamMembers();
-    
+
     // Find and update the member
     const memberIndex = currentMembers.findIndex(m => m.id === body.id);
-    
+
     if (memberIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Team member not found' },
@@ -99,7 +111,7 @@ export async function PUT(request: NextRequest) {
 
     // Validate
     const parsed = teamPayloadSchema.safeParse({ members: currentMembers });
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: 'Invalid data format' },
@@ -109,10 +121,10 @@ export async function PUT(request: NextRequest) {
 
     // Save
     const success = await updateTeamMembers(currentMembers);
-    
+
     if (success) {
-      return NextResponse.json<ApiResponse>({ 
-        success: true, 
+      return NextResponse.json<ApiResponse>({
+        success: true,
         data: updatedMember,
         message: 'Team member updated successfully'
       });

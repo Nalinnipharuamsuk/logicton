@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
 import type { ApiResponse, PortfolioItem } from '@/types';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
+// Use environment variables for DB config
 const dbConfig = {
-  host: 'localhost',
-  port: 3306,
-  user: 'myuser',
-  password: 'mypassword',
-  database: 'mydatabase'
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: parseInt(process.env.MYSQL_PORT || '3306'),
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 };
 
 // GET single portfolio item
@@ -18,33 +21,33 @@ export async function GET(
   try {
     const resolvedParams = await params;
     const id = resolvedParams.id;
-    
+
     if (!id) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'ID is required' },
         { status: 400 }
       );
     }
-    
+
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
       'SELECT * FROM PortfolioItem WHERE id = ?',
       [id]
     );
     await connection.end();
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const items = rows as any[];
-    
+
     if (items.length === 0) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'Portfolio item not found' },
         { status: 404 }
       );
     }
-    
+
     const item = items[0];
-    
+
     // Handle date safely
     let completedDate: Date;
     try {
@@ -52,7 +55,7 @@ export async function GET(
     } catch {
       completedDate = new Date();
     }
-    
+
     // Handle technologies safely
     let technologies: string[];
     try {
@@ -60,7 +63,7 @@ export async function GET(
     } catch {
       technologies = [];
     }
-    
+
     // Handle images safely
     let images: string[];
     try {
@@ -68,7 +71,7 @@ export async function GET(
     } catch {
       images = ['/images/placeholder.png'];
     }
-    
+
     const formattedData: PortfolioItem = {
       id: String(item.id),
       title: {
@@ -91,7 +94,7 @@ export async function GET(
       featured: Number(item.featured) === 1,
       isActive: Number(item.isActive) === 1
     };
-    
+
     return NextResponse.json<ApiResponse>({ success: true, data: formattedData });
   } catch (error) {
     console.error('Failed to fetch portfolio item:', error);
@@ -109,19 +112,24 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const resolvedParams = await params;
     const id = resolvedParams.id;
-    
+
     if (!id) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'ID is required' },
         { status: 400 }
       );
     }
-    
+
     const connection = await mysql.createConnection(dbConfig);
-    
+
     // Check if item exists
     const [checkRows] = await connection.execute(
       'SELECT id FROM PortfolioItem WHERE id = ?',
@@ -129,7 +137,7 @@ export async function PUT(
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const checkItems = checkRows as any[];
-    
+
     if (checkItems.length === 0) {
       await connection.end();
       return NextResponse.json<ApiResponse>(
@@ -137,7 +145,7 @@ export async function PUT(
         { status: 404 }
       );
     }
-    
+
     // Update the item
     await connection.execute(
       `UPDATE PortfolioItem 
@@ -162,9 +170,9 @@ export async function PUT(
         id
       ]
     );
-    
+
     await connection.end();
-    
+
     return NextResponse.json<ApiResponse>({ success: true, message: 'Portfolio item updated successfully' });
   } catch (error) {
     console.error('Failed to update portfolio item:', error);
@@ -181,19 +189,24 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const resolvedParams = await params;
     const id = resolvedParams.id;
-    
+
     if (!id) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'ID is required' },
         { status: 400 }
       );
     }
-    
+
     const connection = await mysql.createConnection(dbConfig);
-    
+
     // Check if item exists
     const [checkRows] = await connection.execute(
       'SELECT id FROM PortfolioItem WHERE id = ?',
@@ -201,7 +214,7 @@ export async function PATCH(
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const checkItems = checkRows as any[];
-    
+
     if (checkItems.length === 0) {
       await connection.end();
       return NextResponse.json<ApiResponse>(
@@ -209,7 +222,7 @@ export async function PATCH(
         { status: 404 }
       );
     }
-    
+
     // Build dynamic update query
     const updateFields: string[] = [];
     const updateValues: (string | number | boolean)[] = [];
@@ -289,21 +302,21 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    
+
     // Add updatedAt and id to values
     updateFields.push('updatedAt = NOW()');
     updateValues.push(id);
-    
+
     await connection.execute(
       `UPDATE PortfolioItem SET ${updateFields.join(', ')} WHERE id = ?`,
       updateValues
     );
-    
+
     await connection.end();
-    
-    return NextResponse.json<ApiResponse>({ 
-      success: true, 
-      message: 'Portfolio item updated successfully' 
+
+    return NextResponse.json<ApiResponse>({
+      success: true,
+      message: 'Portfolio item updated successfully'
     });
   } catch (error) {
     console.error('Failed to update portfolio item:', error);
@@ -320,18 +333,23 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const resolvedParams = await params;
     const id = resolvedParams.id;
-    
+
     if (!id) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'ID is required' },
         { status: 400 }
       );
     }
-    
+
     const connection = await mysql.createConnection(dbConfig);
-    
+
     // Check if item exists
     const [checkRows] = await connection.execute(
       'SELECT id FROM PortfolioItem WHERE id = ?',
@@ -339,7 +357,7 @@ export async function DELETE(
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const checkItems = checkRows as any[];
-    
+
     if (checkItems.length === 0) {
       await connection.end();
       return NextResponse.json<ApiResponse>(
@@ -347,18 +365,18 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    
+
     // Delete the item
     await connection.execute(
       'DELETE FROM PortfolioItem WHERE id = ?',
       [id]
     );
-    
+
     await connection.end();
-    
-    return NextResponse.json<ApiResponse>({ 
-      success: true, 
-      message: 'Portfolio item deleted successfully' 
+
+    return NextResponse.json<ApiResponse>({
+      success: true,
+      message: 'Portfolio item deleted successfully'
     });
   } catch (error) {
     console.error('Failed to delete portfolio item:', error);

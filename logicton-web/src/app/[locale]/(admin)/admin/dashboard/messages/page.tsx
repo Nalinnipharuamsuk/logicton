@@ -6,10 +6,10 @@ import type { ContactInquiry } from '@/types';
 
 export default function ContactMessagesPage() {
   const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
-  const [stats, setStats] = useState({ total: 0, new: 0, read: 0, responded: 0 });
+  const [stats, setStats] = useState({ total: 0, new: 0, read: 0 });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'new' | 'read' | 'responded'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'new' | 'read'>('all');
   const [selectedInquiry, setSelectedInquiry] = useState<ContactInquiry | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -20,7 +20,7 @@ export default function ContactMessagesPage() {
       const data = await res.json();
       if (data.success && data.data) {
         setInquiries(data.data.inquiries || []);
-        setStats(data.data.stats || { total: 0, new: 0, read: 0, responded: 0 });
+        setStats(data.data.stats || { total: 0, new: 0, read: 0 });
       }
     } catch (error) {
       console.error('Failed to load contact inquiries:', error);
@@ -33,7 +33,7 @@ export default function ContactMessagesPage() {
     loadInquiries();
   }, []);
 
-  const handleUpdateStatus = async (id: string, status: 'new' | 'read' | 'responded') => {
+  const handleUpdateStatus = async (id: string, status: 'new' | 'read') => {
     try {
       const res = await fetch(`/api/contact/inquiries/${id}`, {
         method: 'PATCH',
@@ -97,16 +97,14 @@ export default function ContactMessagesPage() {
   });
 
   const getStatusBadge = (status: ContactInquiry['status']) => {
-    const styles = {
+    const styles: Record<string, string> = {
       new: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700',
       read: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-700',
-      responded: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700',
     };
 
-    const icons = {
+    const icons: Record<string, React.ReactNode> = {
       new: <Mail className="h-3.5 w-3.5" />,
       read: <Eye className="h-3.5 w-3.5" />,
-      responded: <CheckCircle className="h-3.5 w-3.5" />,
     };
 
     return (
@@ -152,7 +150,7 @@ export default function ContactMessagesPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900/50 dark:to-slate-800/50 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-between">
             <div>
@@ -178,15 +176,6 @@ export default function ContactMessagesPage() {
               <p className="text-3xl font-bold text-yellow-600">{stats.read}</p>
             </div>
             <Eye className="h-10 w-10 text-yellow-600 opacity-50" />
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 p-6 rounded-xl border border-green-200 dark:border-green-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Responded</p>
-              <p className="text-3xl font-bold text-green-600">{stats.responded}</p>
-            </div>
-            <CheckCircle className="h-10 w-10 text-green-600 opacity-50" />
           </div>
         </div>
       </div>
@@ -233,16 +222,6 @@ export default function ContactMessagesPage() {
             }`}
           >
             Read ({stats.read})
-          </button>
-          <button
-            onClick={() => setFilterStatus('responded')}
-            className={`px-4 py-2 rounded-lg transition-colors font-medium ${
-              filterStatus === 'responded'
-                ? 'bg-green-600 text-white'
-                : 'bg-slate-100 dark:bg-slate-700 text-foreground hover:bg-slate-200 dark:hover:bg-slate-600'
-            }`}
-          >
-            Responded ({stats.responded})
           </button>
         </div>
       </div>
@@ -295,7 +274,7 @@ export default function ContactMessagesPage() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      const nextStatus = inquiry.status === 'new' ? 'read' : inquiry.status === 'read' ? 'responded' : 'new';
+                      const nextStatus = inquiry.status === 'new' ? 'read' : 'new';
                       handleUpdateStatus(inquiry.id, nextStatus);
                     }}
                     className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
@@ -384,12 +363,12 @@ export default function ContactMessagesPage() {
             <div className="p-6 border-t border-border flex gap-3">
               <button
                 onClick={() => {
-                  const nextStatus = selectedInquiry.status === 'new' ? 'read' : selectedInquiry.status === 'read' ? 'responded' : 'new';
+                  const nextStatus = selectedInquiry.status === 'new' ? 'read' : 'new';
                   handleUpdateStatus(selectedInquiry.id, nextStatus);
                 }}
                 className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >
-                Mark as {selectedInquiry.status === 'new' ? 'Read' : selectedInquiry.status === 'read' ? 'Responded' : 'New'}
+                Mark as {selectedInquiry.status === 'new' ? 'Read' : 'New'}
               </button>
               <button
                 onClick={() => {

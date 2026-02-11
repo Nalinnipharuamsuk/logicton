@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Save, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import ServiceIcon from '@/components/ServiceIcon';
 import type { Service } from '@/types';
 
 export default function EditService() {
@@ -25,7 +26,7 @@ export default function EditService() {
     description: { th: '', en: '' },
     features: { th: '', en: '' },
     technologies: '',
-    icon: '🚀',
+    icon: 'Rocket',
     category: 'web',
     order: 0,
     isActive: true,
@@ -104,7 +105,18 @@ export default function EditService() {
     }
   };
 
-  const commonIcons = ['🚀', '💻', '🎨', '⚡', '🔧', '📱', '🎬', '🛡️', '🌐', '📊'];
+  const commonIcons = [
+    { name: 'Rocket', label: 'Rocket' },
+    { name: 'Globe', label: 'Globe' },
+    { name: 'Smartphone', label: 'Smartphone' },
+    { name: 'Palette', label: 'Palette' },
+    { name: 'Layers', label: 'Layers' },
+    { name: 'Code', label: 'Code' },
+    { name: 'Cpu', label: 'CPU' },
+    { name: 'Zap', label: 'Zap' },
+    { name: 'Wrench', label: 'Wrench' },
+    { name: 'Shield', label: 'Shield' },
+  ];
 
   if (loading) {
     return (
@@ -138,16 +150,16 @@ export default function EditService() {
           <div className="flex flex-wrap gap-2 mb-2">
             {commonIcons.map(icon => (
               <button
-                key={icon}
+                key={icon.name}
                 type="button"
-                onClick={() => setFormData({ ...formData, icon })}
-                className={`text-3xl p-2 rounded-lg transition-all ${
-                  formData.icon === icon 
-                    ? 'bg-primary text-primary-foreground scale-110' 
-                    : 'bg-muted hover:bg-muted/80'
+                onClick={() => setFormData({ ...formData, icon: icon.name })}
+                className={`p-3 rounded-lg transition-all ${
+                  formData.icon === icon.name
+                    ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-500 scale-105'
+                    : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border-2 border-transparent'
                 }`}
               >
-                {icon}
+                <ServiceIcon iconName={icon.name} className="w-6 h-6" />
               </button>
             ))}
           </div>
@@ -155,7 +167,7 @@ export default function EditService() {
             type="text"
             value={formData.icon}
             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-            placeholder="Or enter custom emoji"
+            placeholder="Or enter custom icon name (e.g., Globe, Smartphone, Palette)"
             className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground"
           />
         </div>
@@ -277,29 +289,29 @@ export default function EditService() {
           <label className="block text-sm font-medium mb-3">Status *</label>
           <div className="flex gap-4">
             <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-all ${
-              formData.isActive 
-                ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
+              formData.isActive
+                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                 : 'border-slate-300 dark:border-slate-600 hover:border-green-300'
             }`}>
               <input
                 type="radio"
                 name="status"
                 checked={formData.isActive}
- onChange={() => setFormData({ ...formData, isActive: true })}
+                onChange={() => setFormData({ ...formData, isActive: true })}
                 className="w-4 h-4 text-green-600"
               />
               <span className="text-sm font-medium">Publish</span>
             </label>
             <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-all ${
-              !formData.isActive 
-                ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' 
+              !formData.isActive
+                ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
                 : 'border-slate-300 dark:border-slate-600 hover:border-yellow-300'
-              }`}>
+            }`}>
               <input
                 type="radio"
                 name="status"
                 checked={!formData.isActive}
- onChange={() => setFormData({ ...formData, isActive: false })}
+                onChange={() => setFormData({ ...formData, isActive: false })}
                 className="w-4 h-4 text-yellow-600"
               />
               <span className="text-sm font-medium">Draft</span>

@@ -10,10 +10,14 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // In production, this should check against a database or secure storage
-        const adminUsername = process.env.ADMIN_USERNAME || 'admin';
-        const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-        
+        // Enforce environment variables for admin credentials
+        const adminUsername = process.env.ADMIN_USERNAME;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        if (!adminUsername || !adminPassword) {
+          throw new Error("Admin credentials are not properly configured in environment variables.");
+        }
+
         if (credentials?.username === adminUsername && credentials?.password === adminPassword) {
           return {
             id: '1',
@@ -22,7 +26,7 @@ export const authOptions: NextAuthOptions = {
             role: 'admin'
           };
         }
-        
+
         return null;
       }
     })

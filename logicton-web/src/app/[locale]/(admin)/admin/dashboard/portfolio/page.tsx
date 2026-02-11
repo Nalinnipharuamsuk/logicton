@@ -59,7 +59,7 @@ export default function PortfolioManagement() {
   const filteredItems = items.filter(item => {
     const matchesSearch = item.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.title.th.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || 
+    const matchesFilter = filterStatus === 'all' ||
                         (filterStatus === 'published' && item.isActive) ||
                         (filterStatus === 'draft' && !item.isActive);
     return matchesSearch && matchesFilter;
@@ -169,8 +169,8 @@ export default function PortfolioManagement() {
                 <div className="flex items-start justify-between mb-1">
                   <h3 className="font-semibold text-lg text-foreground">{item.title.en}</h3>
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    item.isActive 
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
+                    item.isActive
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                       : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                   }`}>
                     {item.isActive ? 'Published' : 'Draft'}

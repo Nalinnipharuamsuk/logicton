@@ -45,62 +45,60 @@ async function sendEmailNotification({ to, subject, html, text }: SendMessageOpt
   }
 }
 
-// ==================== LINE NOTIFY NOTIFICATIONS ====================
-async function sendLineNotification(message: string): Promise<{ success: boolean; error?: string }> {
-  const token = process.env.LINE_NOTIFY_TOKEN;
+// ==================== SLACK NOTIFICATIONS ====================
+async function sendSlackNotification(message: string): Promise<{ success: boolean; error?: string }> {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
 
-  if (!token || token === 'your_line_notify_token_here') {
-    console.log('LINE Notify not configured. Message would be sent:', message);
+  if (!webhookUrl || webhookUrl === 'your_slack_webhook_url_here') {
+    console.log('Slack not configured. Message would be sent:', message);
     return { success: true };
   }
 
   try {
-    const response = await fetch('https://notify-api.line.me/api/notify', {
+    const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams({
-        message: message,
+      body: JSON.stringify({
+        text: message,
       }),
     });
 
-    const data = await response.json();
-
-    if (data.status === 200) {
-      return { success: true };
-    } else {
-      console.error('LINE Notify error:', data);
-      return { success: false, error: data.message };
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Slack error:', errorText);
+      return { success: false, error: errorText };
     }
+
+    return { success: true };
   } catch (error) {
-    console.error('LINE Notify sending error:', error);
-    return { success: false, error: 'Failed to send LINE notification' };
+    console.error('Slack sending error:', error);
+    return { success: false, error: 'Failed to send Slack notification' };
   }
 }
 
 // ==================== MAIN SEND FUNCTION ====================
 export async function sendNotification({
-  type = 'line', // 'line' or 'email'
+  type = 'slack', // 'slack' or 'email'
   to,
   subject,
   html,
   text,
   message,
 }: {
-  type?: 'line' | 'email';
+  type?: 'slack' | 'email';
   to?: string;
   subject?: string;
   html?: string;
   text?: string;
   message?: string;
 }) {
-  if (type === 'line') {
+  if (type === 'slack') {
     if (!message) {
-      return { success: false, error: 'Message is required for LINE Notify' };
+      return { success: false, error: 'Message is required for Slack' };
     }
-    return await sendLineNotification(message);
+    return await sendSlackNotification(message);
   } else {
     if (!to || !subject) {
       return { success: false, error: 'to, subject are required for email' };

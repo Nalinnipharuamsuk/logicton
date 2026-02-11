@@ -11,7 +11,7 @@ export async function PATCH(
     const body = await request.json();
     const { status } = body;
 
-    if (!status || !['new', 'read', 'responded'].includes(status)) {
+    if (!status || !['new', 'read'].includes(status)) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'Invalid status value' },
         { status: 400 }

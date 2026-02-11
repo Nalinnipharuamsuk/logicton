@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, Search, Layout, Smartphone, Film, Code } from 'lucide-react';
 import Link from 'next/link';
+import ServiceIcon from '@/components/ServiceIcon';
 import type { Service } from '@/types';
 
 export default function ServicesManagement() {
@@ -185,8 +186,8 @@ export default function ServicesManagement() {
               key={service.id}
               className="bg-card rounded-lg border border-border p-4 flex gap-4 hover:shadow-md transition-shadow"
             >
-              <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 text-3xl">
-                {service.icon}
+              <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400">
+                <ServiceIcon iconName={service.icon} className="w-8 h-8" />
               </div>
 
               <div className="flex-1 min-w-0">

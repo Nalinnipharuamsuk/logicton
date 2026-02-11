@@ -1,7 +1,7 @@
 {
   "services": [
     {
-      "id": "service_1738143428000",
+      "id": "service_web_dev",
       "title": {
         "th": "พัฒนาเว็บไซต์",
         "en": "Web Development"
@@ -12,16 +12,20 @@
       },
       "features": {
         "th": [
-          "Responsive Design",
-          "SEO Optimization",
-          "Fast Loading Speed",
-          "Modern UI/UX"
+          " High-Quality Website Solutions",
+          "Get a website and online marketing",
+          "Google Ads Service⠀⠀⠀",
+          "SEO Services",
+          "LINE Official Account Service",
+          "Google Workspace Services"
         ],
         "en": [
-          "Responsive Design",
-          "SEO Optimization",
-          "Fast Loading Speed",
-          "Modern UI/UX"
+          " High-Quality Website Solutions",
+          "Get a website and online marketing",
+          "Google Ads Service⠀⠀⠀",
+          "SEO Services",
+          "LINE Official Account Service",
+          "Google Workspace Services"
         ]
       },
       "technologies": [
@@ -30,13 +34,51 @@
         "TypeScript",
         "Tailwind CSS"
       ],
-      "icon": "🌐",
+      "icon": "Globe",
       "category": "web",
       "order": 1,
-      "isActive": true
+      "isActive": true,
+      "howWeWork": {
+        "th": [
+          {
+            "title": "วิเคราะห์ความต้องการ",
+            "description": "เข้าใจความต้องการของคุณอย่างลึกซึ้ง ทำความวิเคราะห์และวางแผนโครงการที่เหมาะสมที่สุด"
+          },
+          {
+            "title": "ออกแบบและวางแผน",
+            "description": "สร้างแผนและการออกแบบที่ชาญฉลาด โดยทีมนักออกแบบมืออาชีพของเรา"
+          },
+          {
+            "title": "พัฒนาและสร้าง",
+            "description": "พัฒนาโซลูชันที่มีคุณภาพสูง ด้วยเทคโนโลยีที่ทันสมัยและมาตรฐาน"
+          },
+          {
+            "title": "ทดสอบและส่งมอบ",
+            "description": "ประเมินคุณภาพอย่างละเอียด แก้ไขปัญหา และส่งมอบผลงานที่สมบูรณ์"
+          }
+        ],
+        "en": [
+          {
+            "title": "Inform details",
+            "description": "Share your design preferences by sending reference images or examples you like. We use this information to understand your style and scope."
+          },
+          {
+            "title": "Pay for service",
+            "description": "Once the payment is confirmed, we begin the design process and deliver 3–6 design samples within the agreed timeframe."
+          },
+          {
+            "title": "Development",
+            "description": "Building high-quality solutions with modern technologies and standards."
+          },
+          {
+            "title": "Testing & Delivery",
+            "description": "Quality assurance and delivering results that exceed expectations."
+          }
+        ]
+      }
     },
     {
-      "id": "service_1738143428001",
+      "id": "service_mobile_dev",
       "title": {
         "th": "พัฒนาแอปพลิเคชันมือถือ",
         "en": "Mobile App Development"
@@ -47,16 +89,20 @@
       },
       "features": {
         "th": [
-          "Cross-platform Development",
-          "Native Performance",
-          "User-friendly Interface",
-          "App Store Optimization"
+          " High-Quality Website Solutions",
+          "Get a website and online marketing",
+          "Google Ads Service⠀⠀⠀",
+          "SEO Services",
+          "LINE Official Account Service",
+          "Google Workspace Services"
         ],
         "en": [
-          "Cross-platform Development",
-          "Native Performance",
-          "User-friendly Interface",
-          "App Store Optimization"
+          " High-Quality Website Solutions",
+          "Get a website and online marketing",
+          "Google Ads Service⠀⠀⠀",
+          "SEO Services",
+          "LINE Official Account Service",
+          "Google Workspace Services"
         ]
       },
       "technologies": [
@@ -65,88 +111,196 @@
         "Swift",
         "Kotlin"
       ],
-      "icon": "📱",
+      "icon": "Smartphone",
       "category": "mobile",
       "order": 2,
-      "isActive": true
+      "isActive": true,
+      "howWeWork": {
+        "th": [
+          {
+            "title": "วิเคราะห์ความต้องการ",
+            "description": "ทำความวิเคราะห์แอปและความต้องการผู้ใช้งานทุกฝ่าย"
+          },
+          {
+            "title": "ออกแบบ UI/UX",
+            "description": "ออกแบบหน้าจอที่สวยงาม ใช้งานง่ายและเข้าใจผู้ใช้งาน"
+          },
+          {
+            "title": "พัฒนาแอปฯ",
+            "description": "เขียนโค้ดที่มีประสิทธิภาพสำหรับ iOS และ Android"
+          },
+          {
+            "title": "ทดสอบและเผยแพร่",
+            "description": "ทดสอบบนทุกแพลตฟอร์ม แก้ไข bug และเผยแพร่สู่ Store"
+          }
+        ],
+        "en": [
+          {
+            "title": "Analyze Requirements",
+            "description": "Understanding app requirements and user needs across all platforms."
+          },
+          {
+            "title": "Design UI/UX",
+            "description": "Creating beautiful, intuitive interfaces that users love."
+          },
+          {
+            "title": "App Development",
+            "description": "Writing efficient code for iOS and Android platforms."
+          },
+          {
+            "title": "Testing & Launch",
+            "description": "Testing on all platforms, fixing bugs, and launching to stores."
+          }
+        ]
+      }
     },
     {
-      "id": "service_1769658085635",
+      "id": "service_graphic_design",
       "title": {
-        "th": "test test",
+        "th": "ออกแบบกราฟิก",
         "en": "Graphic Design"
       },
       "description": {
-        "th": "test test",
-        "en": "test test"
+        "th": "สร้างกราฟิกที่สวยงามและดึงดูดสายตาสำหรับแบรนด์ของคุณ",
+        "en": "Create stunning graphics that capture attention for your brand"
       },
       "features": {
         "th": [
-          "test test test"
+          "Get the design work that you want",
+          "Quality work worth the price.",
+          "Professional service"
         ],
         "en": [
-          "test test test"
+          "Get the design work that you want",
+          "Quality work worth the price.",
+          "Professional service"
         ]
       },
       "technologies": [
-        "test test test test"
+        "Adobe Photoshop",
+        "Adobe Illustrator",
+        "Figma",
+        "Canva"
       ],
-      "icon": "🎬",
+      "icon": "Palette",
       "category": "animation",
-      "order": 2,
-      "isActive": true
-    },
-    {
-      "id": "service_1769659588425",
-      "title": {
-        "th": "abc",
-        "en": "Famework"
-      },
-      "description": {
-        "th": "abc",
-        "en": "abc"
-      },
-      "features": {
-        "th": [
-          "abc abc"
-        ],
-        "en": [
-          "abc abc"
-        ]
-      },
-      "technologies": [
-        "abc abc"
-      ],
-      "icon": "📊",
-      "category": "framework",
       "order": 3,
-      "isActive": true
+      "isActive": true,
+      "howWeWork": {
+        "th": [
+          {
+            "title": "รับบรีฟ",
+            "description": "สนทนาความต้องการ แบรนด์ และสไตล์ที่ต้องการ"
+          },
+          {
+            "title": "สร้างสร้างสร้าง",
+            "description": "ออกแบบร่างต้นหลายแบบให้คุณเลือก และปรับแก้ได้"
+          },
+          {
+            "title": "ปรับแก้และพัฒนา",
+            "description": "แก้ไขตาม feedback จนกว่าพอใจ และลงตัวสุดท้าย"
+          },
+          {
+            "title": "ส่งมอบไฟล์",
+            "description": "ส่งไฟล์ทุกรูปแบบ (.AI, .PSD, .JPG, .PNG) ให้คุณ"
+          }
+        ],
+        "en": [
+          {
+            "title": "Briefing",
+            "description": "Discuss your requirements, brand identity, and style preferences."
+          },
+          {
+            "title": "Concept Creation",
+            "description": "Create multiple design concepts for you to choose from."
+          },
+          {
+            "title": "Revisions",
+            "description": "Refine based on your feedback until you're completely satisfied."
+          },
+          {
+            "title": "Final Delivery",
+            "description": "Deliver all files in various formats (.AI, .PSD, .JPG, .PNG)."
+          }
+        ]
+      }
     },
     {
-      "id": "service_1769667770904",
+      "id": "service_framework",
       "title": {
-        "th": "rr",
-        "en": "rr"
+        "th": "เฟรมเวิร์กและไลบรารี",
+        "en": "Framework & Libraries"
       },
       "description": {
-        "th": "rr",
-        "en": "rr"
+        "th": "พัฒนาเฟรมเวิร์กและไลบรารีที่ใช้งานง่ายและมีประสิทธิภาพสูง",
+        "en": "Building efficient and easy-to-use frameworks and libraries"
       },
       "features": {
         "th": [
-          "rr"
+          "PHP",
+          "JavaScript",
+          "Java",
+          "ASP.NET Core",
+          "Node.js",
+          "Python"
         ],
         "en": [
-          "rr"
+          "PHP",
+          "JavaScript",
+          "Java",
+          "ASP.NET Core",
+          "Node.js",
+          "Python"
         ]
       },
       "technologies": [
-        "rr"
+        "React",
+        "Vue",
+        "Angular",
+        "Node.js"
       ],
-      "icon": "⚡",
-      "category": "animation",
+      "icon": "Layers",
+      "category": "framework",
       "order": 4,
-      "isActive": false
+      "isActive": true,
+      "howWeWork": {
+        "th": [
+          {
+            "title": "วิเคราะห์และวางแผน",
+            "description": "วิเคราะห์ความต้องการและวางแผนสถาปัตยกรรม"
+          },
+          {
+            "title": "พัฒนา Core",
+            "description": "สร้างระบบ core และ API ที่มีประสิทธิภาพสูง"
+          },
+          {
+            "title": "เขียนเอกสาร",
+            "description": "เขียนเอกสารที่ครบถูกและใช้งานง่าย"
+          },
+          {
+            "title": "ทดสอบและเผยแพร่",
+            "description": "ทดสอบและปล่อยขึ้นสู่ npm หรือ private registry"
+          }
+        ],
+        "en": [
+          {
+            "title": "Analyze & Plan",
+            "description": "Analyze requirements and plan architecture for scalability."
+          },
+          {
+            "title": "Develop Core",
+            "description": "Build core systems and efficient APIs."
+          },
+          {
+            "title": "Documentation",
+            "description": "Write comprehensive documentation that's easy to follow."
+          },
+          {
+            "title": "Test & Publish",
+            "description": "Thorough testing and publish to npm or private registry."
+          }
+        ]
+      }
     }
   ]
 }

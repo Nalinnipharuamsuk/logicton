@@ -1,40 +1,25 @@
 import fs from 'fs';
 import path from 'path';
+import mysql from 'mysql2/promise';
 import { CompanyInfo, TeamMember, Service, PortfolioItem, SiteConfig } from '@/types';
 import {
   companyInfoSchema,
   servicesPayloadSchema,
-  portfolioPayloadSchema,
-  siteConfigSchema
+  portfolioPayloadSchema
 } from '@/lib/validation';
 
-// Try multiple possible content paths
-const POSSIBLE_CONTENT_PATHS = [
-  './logicton-web/content',
-  'logicton-web/content',
-  '../logicton-web/content',
-  './content',
-  process.env.CONTENT_PATH || './logicton-web/content'
-].filter(Boolean);
+// Database connection
+const dbConfig = {
+  host: 'localhost',
+  user: 'myuser',
+  password: 'mypassword',
+  database: 'mydatabase',
+};
 
-function getValidContentPath(): string {
-  console.log('[Content] Current working directory:', process.cwd());
-  for (const testPath of POSSIBLE_CONTENT_PATHS) {
-    const fullPath = path.join(process.cwd(), testPath);
-    console.log(`[Content] Testing path: ${testPath} -> ${fullPath}`);
-    console.log(`[Content] Path exists: ${fs.existsSync(fullPath)}`);
-    if (fs.existsSync(fullPath)) {
-      console.log('[Content] Found valid content path:', fullPath);
-      return testPath;
-    }
-  }
-  console.log('[Content] Using default content path: logicton-web/content');
-  return 'logicton-web/content';
-}
+// Use content directory relative to project root
+const CONTENT_PATH = './content';
 
-const CONTENT_PATH = getValidContentPath();
-
-// Helper function to read JSON files
+// Helper function to read JSON files (fallback for non-database content)
 async function readJsonFile<T>(filePath: string): Promise<T | null> {
   try {
     const fullPath = path.join(process.cwd(), CONTENT_PATH, filePath);
@@ -53,15 +38,15 @@ async function writeJsonFile<T>(filePath: string, data: T): Promise<boolean> {
   try {
     const fullPath = path.join(process.cwd(), CONTENT_PATH, filePath);
     const dir = path.dirname(fullPath);
-    
+
     console.log(`[writeJsonFile] Attempting to write: ${fullPath}`);
-    
+
     // Ensure directory exists
     if (!fs.existsSync(dir)) {
       console.log(`[writeJsonFile] Creating directory: ${dir}`);
       fs.mkdirSync(dir, { recursive: true });
     }
-    
+
     fs.writeFileSync(fullPath, JSON.stringify(data, null, 2));
     return true;
   } catch (error) {
@@ -70,7 +55,7 @@ async function writeJsonFile<T>(filePath: string, data: T): Promise<boolean> {
   }
 }
 
-// Company content functions
+// Company content functions (still use JSON)
 export async function getCompanyInfo(): Promise<CompanyInfo | null> {
   const data = await readJsonFile<CompanyInfo>('company/info.json');
   const parsed = companyInfoSchema.safeParse(data);
@@ -85,7 +70,7 @@ export async function updateCompanyInfo(data: CompanyInfo): Promise<boolean> {
   return writeJsonFile('company/info.json', data);
 }
 
-// Team content functions
+// Team content functions (still use JSON)
 export async function getTeamMembers(): Promise<TeamMember[]> {
   try {
     const data = await readJsonFile<{ members: TeamMember[] }>('company/team.json');
@@ -93,7 +78,6 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
       console.error('Invalid team content: data or members is null/undefined');
       return [];
     }
-    // Return data without validation for GET requests (only validate on write)
     return data.members;
   } catch (error) {
     console.error('Error in getTeamMembers:', error);
@@ -105,33 +89,37 @@ export async function updateTeamMembers(members: TeamMember[]): Promise<boolean>
   return writeJsonFile('company/team.json', { members });
 }
 
-// Services content functions
+// Services content functions - FROM JSON FILE
 export async function getServices(): Promise<Service[]> {
-  console.log('[getServices] CONTENT_PATH:', CONTENT_PATH);
-  const filePath = path.join(process.cwd(), CONTENT_PATH, 'services/services.json');
-  console.log('[getServices] Full file path:', filePath);
-  console.log('[getServices] File exists:', fs.existsSync(filePath));
-  
-  const data = await readJsonFile<{ services: Service[] }>('services/services.json');
-  console.log('[getServices] Raw data:', data);
-  
-  const parsed = servicesPayloadSchema.safeParse(data);
-  if (!parsed.success) {
-    console.error('Invalid services content', parsed.error.format());
+  console.log('[getServices] Fetching from JSON file...');
+  try {
+    const data = await readJsonFile<{ services: Service[] }>('services/services.json');
+    if (data && data.services) {
+      console.log('[getServices] Found services:', data.services.length);
+      return data.services;
+    }
+    return [];
+  } catch (error) {
+    console.error('[getServices] Error reading JSON file:', error);
     return [];
   }
-  
-  console.log('[getServices] Parsed services:', parsed.data.services.length, 'items');
-  console.log('[getServices] Service IDs:', parsed.data.services.map(s => s.id));
-  
-  return parsed.data.services;
 }
 
 export async function updateServices(services: Service[]): Promise<boolean> {
-  return writeJsonFile('services/services.json', { services });
+  console.log('[updateServices] Updating JSON file...');
+  try {
+    const result = await writeJsonFile('services/services.json', { services });
+    if (result) {
+      console.log('[updateServices] Services updated successfully');
+    }
+    return result;
+  } catch (error) {
+    console.error('[updateServices] Error:', error);
+    return false;
+  }
 }
 
-// Portfolio content functions
+// Portfolio content functions (still use JSON)
 export async function getPortfolioItems(): Promise<PortfolioItem[]> {
   const data = await readJsonFile<{ items: PortfolioItem[] }>('portfolio/items.json');
   const parsed = portfolioPayloadSchema.safeParse(data);
@@ -146,19 +134,9 @@ export async function updatePortfolioItems(items: PortfolioItem[]): Promise<bool
   return writeJsonFile('portfolio/items.json', { items });
 }
 
-// Site configuration functions
+// Site configuration functions (still use JSON)
 export async function getSiteConfig(): Promise<SiteConfig | null> {
-  const data = await readJsonFile<SiteConfig>('settings/site-config.json');
-  const parsed = siteConfigSchema.safeParse(data);
-  if (!parsed.success) {
-    console.error('Invalid site config content', parsed.error.format());
-    return null;
-  }
-  return parsed.data;
-}
-
-export async function updateSiteConfig(config: SiteConfig): Promise<boolean> {
-  return writeJsonFile('settings/site-config.json', config);
+  return await readJsonFile<SiteConfig>('settings/site-config.json');
 }
 
 // Utility functions

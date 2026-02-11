@@ -44,7 +44,17 @@ export const serviceSchema = z.object({
   icon: z.string().min(1),
   category: z.enum(['web', 'mobile', 'animation', 'framework']),
   order: z.number().int(),
-  isActive: z.boolean()
+  isActive: z.boolean(),
+  howWeWork: z.object({
+    th: z.array(z.object({
+      title: z.string(),
+      description: z.string()
+    })).optional(),
+    en: z.array(z.object({
+      title: z.string(),
+      description: z.string()
+    })).optional()
+  }).optional()
 });
 
 export const portfolioItemSchema = z.object({
@@ -75,29 +85,29 @@ export const contactInquirySchema = z.object({
   message: z.string().min(1),
   language: z.enum(['th', 'en']),
   submittedAt: z.string().min(1),
-  status: z.enum(['new', 'read', 'responded']),
+  status: z.enum(['new', 'read']),
   ipAddress: z.string().min(1)
 });
 
 export const siteConfigSchema = z.object({
-  siteName: localizedStringSchema,
-  siteDescription: localizedStringSchema,
+  siteName: localizedStringSchema.optional(),
+  siteDescription: localizedStringSchema.optional(),
   contactInfo: z.object({
-    email: z.string().email(),
-    phone: z.string().min(1),
-    address: localizedStringSchema
-  }),
+    email: z.string().email().optional(),
+    phone: z.string().optional(),
+    address: localizedStringSchema.optional()
+  }).optional(),
   socialMedia: z.object({
-    facebook: z.string().url(),
-    linkedin: z.string().url(),
-    twitter: z.string().url()
-  }),
+    facebook: z.string().url().optional(),
+    linkedin: z.string().url().optional(),
+    twitter: z.string().url().optional()
+  }).optional(),
   seo: z.object({
     keywords: z.object({
       th: z.array(z.string().min(1)),
       en: z.array(z.string().min(1))
     })
-  })
+  }).optional()
 });
 
 export const teamPayloadSchema = z.object({

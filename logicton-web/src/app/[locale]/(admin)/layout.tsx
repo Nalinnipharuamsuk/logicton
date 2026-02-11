@@ -5,6 +5,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, Briefcase, FileText, Mail, LogOut } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { EditModeProvider } from '@/providers/EditModeProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export default function AdminLayout({
   children,
@@ -22,7 +24,7 @@ export default function AdminLayout({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -38,87 +40,91 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 fixed h-full">
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-slate-900">Admin Panel</h1>
-        </div>
-        
-        <nav className="p-4">
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/admin/dashboard"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-              >
-                <LayoutDashboard className="h-5 w-5 text-slate-600" />
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/dashboard/portfolio"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-              >
-                <Briefcase className="h-5 w-5 text-slate-600" />
-                Portfolio
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/dashboard/services"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-              >
-                <FileText className="h-5 w-5 text-slate-600" />
-                Services
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/dashboard/team"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-              >
-                <Users className="h-5 w-5 text-slate-600" />
-                Team
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/dashboard/messages"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-              >
-                <Mail className="h-5 w-5 text-slate-600" />
-                Messages
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-              >
-                <LayoutDashboard className="h-5 w-5 text-slate-600" />
-                View Site
-              </Link>
-            </li>
-          </ul>
-        </nav>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
+      <div className="flex min-h-screen bg-background">
+        {/* Sidebar */}
+        <aside className="w-64 bg-card border-r border-border fixed h-full">
+          <div className="p-6">
+            <h1 className="text-xl font-bold text-card-foreground">Admin Panel</h1>
+          </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors text-red-600 font-medium w-full"
-          >
-            <LogOut className="h-5 w-5" />
-            Logout
-          </button>
-        </div>
-      </aside>
+          <nav className="p-4">
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-card-foreground font-medium"
+                >
+                  <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/dashboard/portfolio"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-card-foreground font-medium"
+                >
+                  <Briefcase className="h-5 w-5 text-muted-foreground" />
+                  Portfolio
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/dashboard/services"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-card-foreground font-medium"
+                >
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/dashboard/team"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-card-foreground font-medium"
+                >
+                  <Users className="h-5 w-5 text-muted-foreground" />
+                  Team
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/dashboard/messages"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-card-foreground font-medium"
+                >
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                  Messages
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-card-foreground font-medium"
+                >
+                  <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+                  View Site
+                </Link>
+              </li>
+            </ul>
+          </nav>
 
-      {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 text-slate-900">
-        {children}
-      </main>
-    </div>
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400 font-medium w-full"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 ml-64 p-8 text-card-foreground">
+          <EditModeProvider>
+            {children}
+          </EditModeProvider>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }

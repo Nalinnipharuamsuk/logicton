@@ -213,17 +213,75 @@ export async function PATCH(
     // Build dynamic update query
     const updateFields: string[] = [];
     const updateValues: (string | number | boolean)[] = [];
-    
+
+    // Boolean fields
     if (typeof body.isActive === 'boolean') {
       updateFields.push('isActive = ?');
       updateValues.push(body.isActive ? 1 : 0);
     }
-    
+
     if (typeof body.featured === 'boolean') {
       updateFields.push('featured = ?');
       updateValues.push(body.featured ? 1 : 0);
     }
-    
+
+    // Nested object fields (title, description, client)
+    if (body.title?.th !== undefined) {
+      updateFields.push('titleTh = ?');
+      updateValues.push(String(body.title.th));
+    }
+
+    if (body.title?.en !== undefined) {
+      updateFields.push('titleEn = ?');
+      updateValues.push(String(body.title.en));
+    }
+
+    if (body.description?.th !== undefined) {
+      updateFields.push('descriptionTh = ?');
+      updateValues.push(String(body.description.th));
+    }
+
+    if (body.description?.en !== undefined) {
+      updateFields.push('descriptionEn = ?');
+      updateValues.push(String(body.description.en));
+    }
+
+    if (body.client?.name !== undefined) {
+      updateFields.push('clientName = ?');
+      updateValues.push(String(body.client.name));
+    }
+
+    if (body.client?.industry !== undefined) {
+      updateFields.push('clientIndustry = ?');
+      updateValues.push(String(body.client.industry));
+    }
+
+    // Direct fields
+    if (body.technologies !== undefined) {
+      updateFields.push('technologies = ?');
+      updateValues.push(Array.isArray(body.technologies) ? body.technologies.join(',') : String(body.technologies));
+    }
+
+    if (body.images !== undefined) {
+      updateFields.push('images = ?');
+      updateValues.push(Array.isArray(body.images) ? body.images[0] || '' : String(body.images));
+    }
+
+    if (body.demoUrl !== undefined) {
+      updateFields.push('demoUrl = ?');
+      updateValues.push(String(body.demoUrl));
+    }
+
+    if (body.category !== undefined) {
+      updateFields.push('category = ?');
+      updateValues.push(String(body.category));
+    }
+
+    if (body.completedDate !== undefined) {
+      updateFields.push('completedDate = ?');
+      updateValues.push(new Date(body.completedDate).toISOString());
+    }
+
     if (updateFields.length === 0) {
       await connection.end();
       return NextResponse.json<ApiResponse>(

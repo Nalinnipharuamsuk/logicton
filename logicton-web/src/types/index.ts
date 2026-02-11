@@ -65,6 +65,16 @@ export interface Service {
   category: 'web' | 'mobile' | 'animation' | 'framework';
   order: number;
   isActive: boolean;
+  howWeWork?: {
+    th: Array<{
+      title: string;
+      description: string;
+    }>;
+    en: Array<{
+      title: string;
+      description: string;
+    }>;
+  };
 }
 
 // Portfolio Types
@@ -103,34 +113,34 @@ export interface ContactInquiry {
   message: string;
   language: 'th' | 'en';
   submittedAt: string;
-  status: 'new' | 'read' | 'responded';
+  status: 'new' | 'read';
   ipAddress: string;
 }
 
 // Site Configuration Types
 export interface SiteConfig {
-  siteName: {
+  siteName?: {
     th: string;
     en: string;
   };
-  siteDescription: {
+  siteDescription?: {
     th: string;
     en: string;
   };
-  contactInfo: {
-    email: string;
-    phone: string;
-    address: {
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: {
       th: string;
       en: string;
     };
   };
-  socialMedia: {
-    facebook: string;
-    linkedin: string;
-    twitter: string;
+  socialMedia?: {
+    facebook?: string;
+    linkedin?: string;
+    twitter?: string;
   };
-  seo: {
+  seo?: {
     keywords: {
       th: string[];
       en: string[];

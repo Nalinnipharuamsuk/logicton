@@ -5,7 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
-import { Providers } from './providers';
+import { RootProviders } from '@/components/RootProviders';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -39,14 +39,34 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
+            <head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                try {
+                                    var theme = localStorage.getItem('theme');
+                                    if (!theme || theme === 'dark') {
+                                        document.documentElement.classList.add('dark');
+                                    } else {
+                                        document.documentElement.classList.remove('dark');
+                                    }
+                                } catch (e) {
+                                    document.documentElement.classList.add('dark');
+                                }
+                            })();
+                        `,
+                    }}
+                />
+            </head>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground flex flex-col min-h-screen`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
             >
-                <Providers>
+                <RootProviders>
                     <NextIntlClientProvider messages={messages}>
                         {children}
                     </NextIntlClientProvider>
-                </Providers>
+                </RootProviders>
             </body>
         </html>
     );

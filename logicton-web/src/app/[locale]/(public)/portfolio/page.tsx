@@ -5,6 +5,11 @@ import { useLocale } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import type { PortfolioItem, Service } from '@/types';
+import { EditableText } from '@/components/EditableText';
+
+interface InlineContent {
+    [key: string]: string;
+}
 
 export default function PortfolioPage() {
     const locale = useLocale();
@@ -12,8 +17,30 @@ export default function PortfolioPage() {
     const [services, setServices] = useState<Service[]>([]);
     const [filter, setFilter] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
+    const [inlineContent, setInlineContent] = useState<InlineContent>({});
+    const [contentLoaded, setContentLoaded] = useState(false);
     const itemsPerPage = 6;
 
+    // Load inline edited content
+    useEffect(() => {
+        const loadInlineContent = async () => {
+            setContentLoaded(false);
+            try {
+                const res = await fetch(`/api/content/inline-edit?page=portfolio&locale=${locale}`);
+                const data = await res.json();
+                if (data.success && data.data) {
+                    setInlineContent(data.data);
+                }
+            } catch (error) {
+                console.error('Failed to load inline content:', error);
+            } finally {
+                setContentLoaded(true);
+            }
+        };
+        loadInlineContent();
+    }, [locale]);
+
+    // Load portfolio and services data
     useEffect(() => {
         Promise.all([
             fetch('/api/content/portfolio'),
@@ -34,6 +61,20 @@ export default function PortfolioPage() {
         .catch(console.error);
     }, []);
 
+    // Show loading state until inline content is loaded
+    if (!contentLoaded) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-pulse text-muted-foreground">Loading...</div>
+            </div>
+        );
+    }
+
+    // Helper to get content (inline edited content takes priority over default)
+    const getContent = (path: string, defaultValue: string): string => {
+        return inlineContent[path] || defaultValue;
+    };
+
     const filteredPortfolio = filter === 'all'
         ? portfolio
         : portfolio.filter(item => item.category === filter);
@@ -47,44 +88,61 @@ export default function PortfolioPage() {
     const categories = ['all', ...servicesCategories];
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
-            {/* Header Section */}
-            <section className="py-16 md:py-24 bg-blue-50">
-                <div className="max-w-[1200px] mx-auto px-6">
-                    {/* Subtitle */}
+        <div className="flex flex-col min-h-screen">
+            {/* Header Section - Premium Design with Gradients and Glow */}
+            <section className="relative overflow-hidden py-20 contact-hero-section">
+                {/* Animated floating orbs with glow effect */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="contact-hero-orb-1 -top-20 -right-20"></div>
+                    <div className="contact-hero-orb-2 -bottom-20 -left-20"></div>
+                    <div className="contact-hero-orb-3 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                </div>
+                <div className="relative z-10 max-w-[1400px] mx-auto px-6">
+                    {/* Badge */}
                     <div className="text-center mb-8">
-                        <p className="text-blue-600 text-sm md:text-base font-semibold tracking-wider">OUR PORTFOLIO</p>
+                        <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full contact-hero-badge text-sm font-semibold transition-all duration-300">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <EditableText
+                                value={getContent('portfolio.header.badge', locale === 'th' ? 'ผลงานของเรา' : 'OUR PORTFOLIO')}
+                                path="portfolio.header.badge"
+                                locale={locale as 'th' | 'en'}
+                                className=""
+                            />
+                        </div>
                     </div>
 
                     {/* Main Title */}
-                    <h1 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-6 leading-tight max-w-4xl mx-auto">
-                        Our Impact Through<br />Innovation
-                    </h1>
+                    <EditableText
+                        value={getContent('portfolio.header.title', locale === 'th' ? 'ผลกระทบจาก<br />นวัตกรรมของเรา' : 'Our Impact Through<br />Innovation')}
+                        path="portfolio.header.title"
+                        locale={locale as 'th' | 'en'}
+                        type="heading"
+                        className="text-4xl md:text-5xl lg:text-6xl font-bold text-center contact-hero-title mb-6 leading-tight max-w-4xl mx-auto"
+                    />
 
                     {/* Description */}
-                    <p className="text-center text-gray-600 max-w-3xl mx-auto mb-8 text-base md:text-lg leading-relaxed">
-                        Explore how Logicton transforms industries through custom software and cutting-edge technology. We deliver results that matter.
-                    </p>
-
-                    {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <button className="px-8 py-3 md:px-10 md:py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
-                            Start Your Project
-                        </button>
-                        <button className="px-8 py-3 md:px-10 md:py-4 bg-white hover:bg-gray-50 text-blue-600 font-semibold rounded-lg border border-blue-200 transition-colors">
-                            View All Cases
-                        </button>
-                    </div>
+                    <EditableText
+                        value={getContent('portfolio.header.description',
+                            locale === 'th'
+                                ? 'สำรวจวิธีที่ Logicton เปลี่ยนแปลงอุตสาหกรรมผ่านซอฟต์แวร์ที่สั่งทำขึ้นโดยเฉพาะและเทคโนโลยีขั้นสูง เรามอบผลลัพธ์ที่สำคัญ'
+                                : 'Explore how Logicton transforms industries through custom software and cutting-edge technology. We deliver results that matter.')}
+                        path="portfolio.header.description"
+                        locale={locale as 'th' | 'en'}
+                        type="paragraph"
+                        className="text-center contact-hero-subtitle max-w-3xl mx-auto text-base md:text-lg leading-relaxed"
+                    />
                 </div>
             </section>
 
             {/* Filter Section */}
-            <section className="py-8 md:py-12 bg-white border-b border-gray-200">
-                <div className="max-w-[1200px] mx-auto px-6">
+            <section className="py-8 md:py-12 bg-card border-b border-border">
+                <div className="max-w-[1400px] mx-auto px-6">
                     <div className="flex flex-wrap gap-3 items-center">
                         {categories.map((cat) => {
-                            const serviceTitle = cat === 'all' 
-                                ? 'ALL PROJECTS'
+                            const serviceTitle = cat === 'all'
+                                ? getContent('portfolio.filter.all', locale === 'th' ? 'โปรเจกต์ทั้งหมด' : 'ALL PROJECTS')
                                 : services.find((s: Service) => s.category === cat)?.title[locale as 'th' | 'en'] || cat.toUpperCase();
                             return (
                                 <button
@@ -96,7 +154,7 @@ export default function PortfolioPage() {
                                     className={`px-4 md:px-6 py-2 rounded-lg font-semibold text-sm transition-all ${
                                         filter === cat
                                             ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            : 'bg-muted text-foreground hover:bg-muted-foreground/10'
                                     }`}
                                 >
                                     {serviceTitle}
@@ -104,8 +162,13 @@ export default function PortfolioPage() {
                             );
                         })}
                         <div className="ml-auto">
-                            <button className="flex items-center gap-2 px-4 py-2 text-gray-700 font-semibold hover:bg-gray-100 rounded-lg transition-colors">
-                                Most Recent
+                            <button className="flex items-center gap-2 px-4 py-2 text-foreground font-semibold hover:bg-muted rounded-lg transition-colors">
+                                <EditableText
+                                    value={getContent('portfolio.filter.sort', locale === 'th' ? 'ล่าสุด' : 'Most Recent')}
+                                    path="portfolio.filter.sort"
+                                    locale={locale as 'th' | 'en'}
+                                    className=""
+                                />
                                 <ChevronDown className="h-4 w-4" />
                             </button>
                         </div>
@@ -114,17 +177,17 @@ export default function PortfolioPage() {
             </section>
 
             {/* Portfolio Grid */}
-            <section className="py-16 md:py-24 bg-white">
-                <div className="max-w-[1200px] mx-auto px-6">
+            <section className="py-16 md:py-24 bg-card">
+                <div className="max-w-[1400px] mx-auto px-6">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {displayedPortfolio.map((item) => (
                             <Link
                                 key={item.id}
                                 href={`/${locale}/portfolio/${item.id}`}
-                                className="group block rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                                className="group flex flex-col rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 h-full"
                             >
                                 {/* Image Container */}
-                                <div className="relative aspect-video bg-gray-200 overflow-hidden">
+                                <div className="relative aspect-video bg-gray-200 dark:bg-gray-200 overflow-hidden">
                                     {item.images && item.images.length > 0 ? (
                                         <img
                                             src={item.images[0]}
@@ -132,21 +195,21 @@ export default function PortfolioPage() {
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
-                                        <div className="flex items-center justify-center h-full bg-gray-300">
-                                            <span className="text-gray-500">No Image</span>
+                                        <div className="flex items-center justify-center h-full bg-gray-200">
+                                            <span className="!text-gray-500">No Image</span>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Content */}
-                                <div className="p-6">
-                                    <p className="text-blue-600 text-xs font-semibold uppercase tracking-wider mb-2">
+                                <div className="p-6 portfolio-card-content flex flex-col">
+                                    <p className="portfolio-category text-xs font-semibold uppercase tracking-wider mb-2">
                                         {services.find((s: Service) => s.category === item.category)?.title[locale as 'th' | 'en'] || item.category}
                                     </p>
-                                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                                    <h3 className="text-lg md:text-xl font-bold portfolio-card-title mb-3 transition-colors line-clamp-2 h-14">
                                         {item.title[locale as 'th' | 'en']}
                                     </h3>
-                                    <p className="text-gray-600 text-sm line-clamp-2">
+                                    <p className="portfolio-card-desc text-sm line-clamp-2">
                                         {item.description && item.description[locale as 'th' | 'en']}
                                     </p>
                                 </div>
@@ -164,7 +227,7 @@ export default function PortfolioPage() {
                                     className={`w-10 h-10 rounded-full font-semibold transition-all ${
                                         page === currentPage
                                             ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            : 'bg-muted text-foreground hover:bg-muted-foreground/10'
                                     }`}
                                 >
                                     {page}
@@ -175,23 +238,46 @@ export default function PortfolioPage() {
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-16 md:py-24 bg-gray-900 text-white">
-                <div className="max-w-[1200px] mx-auto px-6">
+            {/* CTA Section - Premium Design */}
+            <section className="py-20 md:py-32 portfolio-cta-section text-white relative">
+                {/* Floating decorative orbs */}
+                <div className="portfolio-cta-orb portfolio-cta-orb-1"></div>
+                <div className="portfolio-cta-orb portfolio-cta-orb-2"></div>
+
+                <div className="max-w-[1400px] mx-auto px-6 relative z-10">
                     <div className="text-center max-w-4xl mx-auto">
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-                            Ready to build your next<br />breakthrough?
-                        </h2>
-                        <p className="text-gray-300 mb-8 text-base md:text-lg leading-relaxed">
-                            Join the ranks of leading enterprises that trust Logicton for their most critical software initiatives.
-                        </p>
+                        <EditableText
+                            value={getContent('portfolio.cta.title', locale === 'th' ? 'พร้อมสร้าง<Br />นวัตกรรมครั้งใหญ่ของคุณหรือยัง?' : 'Ready to build your next<br />breakthrough?')}
+                            path="portfolio.cta.title"
+                            locale={locale as 'th' | 'en'}
+                            type="heading"
+                            className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight portfolio-cta-title"
+                        />
+                        <EditableText
+                            value={getContent('portfolio.cta.description',
+                                locale === 'th'
+                                    ? 'ร่วมเป็นส่วนหนึ่งขององค์กรชั้นนำที่ไว้วางใจ Logicton สำหรับโครงการซอฟต์แวร์ที่สำคัญที่สุดของพวกเขา'
+                                    : 'Join the ranks of leading enterprises that trust Logicton for their most critical software initiatives.')}
+                            path="portfolio.cta.description"
+                            locale={locale as 'th' | 'en'}
+                            type="paragraph"
+                            className="portfolio-cta-desc mb-10 text-base md:text-lg leading-relaxed"
+                        />
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <button className="px-8 py-3 md:px-10 md:py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
-                                Schedule a Consultation
-                            </button>
-                            <button className="px-8 py-3 md:px-10 md:py-4 bg-transparent hover:bg-gray-800 text-white font-semibold rounded-lg border border-white transition-colors">
-                                Our Process
-                            </button>
+                            <EditableText
+                                value={getContent('portfolio.cta.button1', locale === 'th' ? 'นัดหมายปรึกษา' : 'Schedule a Consultation')}
+                                path="portfolio.cta.button1"
+                                locale={locale as 'th' | 'en'}
+                                type="text"
+                                className="px-8 py-4 md:px-12 md:py-5 text-white font-semibold rounded-xl cursor-pointer inline-block text-center portfolio-cta-button-primary"
+                            />
+                            <EditableText
+                                value={getContent('portfolio.cta.button2', locale === 'th' ? 'กระบวนการของเรา' : 'Our Process')}
+                                path="portfolio.cta.button2"
+                                locale={locale as 'th' | 'en'}
+                                type="text"
+                                className="px-8 py-4 md:px-12 md:py-5 text-white font-semibold rounded-xl cursor-pointer inline-block text-center portfolio-cta-button-secondary"
+                            />
                         </div>
                     </div>
                 </div>

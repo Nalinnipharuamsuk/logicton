@@ -12,13 +12,13 @@ export function isValidLocale(locale: string): locale is Locale {
 
 // Get default locale based on user preferences or location
 export function getDefaultLocale(acceptLanguage?: string): Locale {
-  if (!acceptLanguage) return 'th';
-  
+  if (!acceptLanguage) return 'en';
+
   // Check if Thai is preferred
   if (acceptLanguage.includes('th')) return 'th';
-  
-  // Default to Thai for Thailand-based users, English otherwise
-  return acceptLanguage.includes('th-TH') ? 'th' : 'en';
+
+  // Default to English
+  return 'en';
 }
 
 // Format date based on locale
@@ -60,7 +60,7 @@ export function extractLocaleFromPathname(pathname: string): { locale: Locale; p
   }
   
   return {
-    locale: 'th', // default locale
+    locale: 'en', // default locale
     path: pathname,
   };
 }

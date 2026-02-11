@@ -7,27 +7,29 @@ import { getToken } from 'next-auth/jwt';
 const intlMiddleware = createMiddleware(routing);
 
 export default async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 1. Secure Admin Routes (Priority Check)
+  // Check if it's an admin route (excluding login)
+  if (pathname.includes('/admin/dashboard')) {
+    const token = await getToken({ req: request });
+
+    if (!token) {
+      // Redirect to login if not authenticated
+      const url = new URL('/login', request.url);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // 2. Run Internationalization Middleware
   // First run the internationalization middleware
   const intlResponse = intlMiddleware(request);
-  
+
   // If intl middleware modified the response, return it
   if (intlResponse) {
-    const { pathname } = request.nextUrl;
-    
-    // Check if it's an admin route (excluding login)
-    if (pathname.includes('/admin/dashboard')) {
-      const token = await getToken({ req: request });
-      
-      if (!token) {
-        // Redirect to login if not authenticated
-        const url = new URL('/login', request.url);
-        return NextResponse.redirect(url);
-      }
-    }
-    
     return intlResponse;
   }
-  
+
   return intlResponse;
 }
 

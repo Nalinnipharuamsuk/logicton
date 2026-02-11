@@ -9,7 +9,7 @@ export default function AdminDashboard() {
     portfolio: 0,
     services: 0,
     team: 0,
-    inquiries: { total: 0, new: 0, read: 0, responded: 0 }
+    inquiries: { total: 0, new: 0, read: 0 }
   });
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
         portfolio: portfolioData.success ? portfolioData.data.length : 0,
         services: servicesData.success ? servicesData.data.length : 0,
         team: teamData.success ? teamData.data.length : 0,
-        inquiries: inquiriesData.success ? inquiriesData.data.stats : { total: 0, new: 0, read: 0, responded: 0 }
+        inquiries: inquiriesData.success ? inquiriesData.data.stats : { total: 0, new: 0, read: 0 }
       });
     })
     .catch(console.error);

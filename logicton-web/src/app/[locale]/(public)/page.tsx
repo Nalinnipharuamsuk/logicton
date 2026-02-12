@@ -113,12 +113,12 @@ function HomeContent() {
                         {/* Left Content */}
                         <div className="space-y-6">
                             {/* Badge */}
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 text-sm font-semibold">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/80 dark:to-pink-900/80 text-purple-700 dark:text-white text-sm font-semibold">
                                 <EditableText
                                     value={getContent('home.hero.badge', locale === 'th' ? 'นวัตกรรมเทคโนโลยี' : 'INNOVATING TECH')}
                                     path="home.hero.badge"
                                     locale={locale as 'th' | 'en'}
-                                    className=""
+                                    className="text-purple-700 dark:text-white"
                                 />
                             </div>
 
@@ -431,7 +431,7 @@ function HomeContent() {
                                             value={getContent('home.whyChoose.item1.title', locale === 'th' ? 'ความเชี่ยวชาญด้านเทคนิค' : 'Technical Expertise')}
                                             path="home.whyChoose.item1.title"
                                             locale={locale as 'th' | 'en'}
-                                            className="font-bold text-lg mb-1"
+                                            className="block font-bold text-lg mb-1"
                                         />
                                         <EditableText
                                             value={getContent('home.whyChoose.item1.description', locale === 'th'
@@ -451,7 +451,7 @@ function HomeContent() {
                                             value={getContent('home.whyChoose.item2.title', locale === 'th' ? 'วิธีการอ่อนตัว' : 'Agile Methodology')}
                                             path="home.whyChoose.item2.title"
                                             locale={locale as 'th' | 'en'}
-                                            className="font-bold text-lg mb-1"
+                                            className="block font-bold text-lg mb-1"
                                         />
                                         <EditableText
                                             value={getContent('home.whyChoose.item2.description', locale === 'th'
@@ -471,7 +471,7 @@ function HomeContent() {
                                             value={getContent('home.whyChoose.item3.title', locale === 'th' ? 'การสนับสนุน 24/7' : 'End-to-End Support')}
                                             path="home.whyChoose.item3.title"
                                             locale={locale as 'th' | 'en'}
-                                            className="font-bold text-lg mb-1"
+                                            className="block font-bold text-lg mb-1"
                                         />
                                         <EditableText
                                             value={getContent('home.whyChoose.item3.description', locale === 'th'

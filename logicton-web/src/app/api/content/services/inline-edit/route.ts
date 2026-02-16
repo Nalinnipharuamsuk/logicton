@@ -21,14 +21,13 @@ interface ServiceChange {
 
 export async function POST(request: NextRequest) {
   let connection;
+
   try {
-    // 1. Strict Authentication & Authorization
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Role check (Admin only)
     if ((session.user as any).role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
@@ -40,15 +39,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid changes data' }, { status: 400 });
     }
 
-    // 2. Database Connection using Environment Variables
     if (!dbConfig.user || !dbConfig.password) {
       throw new Error('Database credentials not configured');
     }
+
     connection = await mysql.createConnection(dbConfig);
 
     try {
-      // Group changes by service ID
       const changesByService: Map<string, ServiceChange[]> = new Map();
+
       changes.forEach(change => {
         if (!changesByService.has(change.serviceId)) {
           changesByService.set(change.serviceId, []);
@@ -56,9 +55,11 @@ export async function POST(request: NextRequest) {
         changesByService.get(change.serviceId)!.push(change);
       });
 
-      // Apply changes to each service in database
       for (const [serviceId, serviceChanges] of changesByService.entries()) {
-        const [serviceRows] = await connection.execute('SELECT * FROM Service WHERE id = ?', [serviceId]) as [any[], any];
+        const [serviceRows] = await connection.execute(
+          'SELECT * FROM Service WHERE id = ?',
+          [serviceId]
+        ) as [any[], any];
 
         if (serviceRows.length === 0) continue;
 
@@ -67,11 +68,7 @@ export async function POST(request: NextRequest) {
         for (const change of serviceChanges) {
           const { field, locale, value, index } = change;
 
-          // 3. Strict Input Validation (Prevent SQLi in column names)
-          if (locale !== 'th' && locale !== 'en') {
-            console.warn(`Invalid locale: ${locale}`);
-            continue;
-          }
+          if (locale !== 'th' && locale !== 'en') continue;
 
           const suffix = locale === 'th' ? 'Th' : 'En';
 
@@ -90,53 +87,50 @@ export async function POST(request: NextRequest) {
               );
               break;
 
-            case 'features':
-              const featuresKey = `features${suffix}`;
-              const currentFeatures = service[featuresKey] ? (typeof service[featuresKey] === 'string' ? JSON.parse(service[featuresKey]) : service[featuresKey]) : [];
+            case 'features': {
+              const key = `features${suffix}`;
+              const current = service[key]
+                ? (typeof service[key] === 'string' ? JSON.parse(service[key]) : service[key])
+                : [];
 
-              if (typeof index === 'number') {
-                // Update specific feature index in JSON array
-                if (Array.isArray(currentFeatures)) {
-                  currentFeatures[index] = value;
-                  await connection.execute(
-                    `UPDATE Service SET ${featuresKey} = ?, updatedAt = NOW() WHERE id = ?`,
-                    [JSON.stringify(currentFeatures), serviceId]
-                  );
-                }
+              if (typeof index === 'number' && Array.isArray(current)) {
+                current[index] = value;
+                await connection.execute(
+                  `UPDATE Service SET ${key} = ?, updatedAt = NOW() WHERE id = ?`,
+                  [JSON.stringify(current), serviceId]
+                );
               } else if (Array.isArray(value)) {
                 await connection.execute(
-                  `UPDATE Service SET ${featuresKey} = ?, updatedAt = NOW() WHERE id = ?`,
+                  `UPDATE Service SET ${key} = ?, updatedAt = NOW() WHERE id = ?`,
                   [JSON.stringify(value), serviceId]
                 );
               }
               break;
+            }
 
             case 'technologies':
-              // Technologies is usually shared, or check schema. Assuming it's shared or simple JSON
               await connection.execute(
                 `UPDATE Service SET technologies = ?, updatedAt = NOW() WHERE id = ?`,
                 [JSON.stringify(value), serviceId]
               );
               break;
 
-            case 'howWeWork':
-              const howWeWorkKey = `howWeWork${suffix}`;
-              const currentHowWeWork = service[howWeWorkKey] ? (typeof service[howWeWorkKey] === 'string' ? JSON.parse(service[howWeWorkKey]) : service[howWeWorkKey]) : [];
+            case 'howWeWork': {
+              const key = `howWeWork${suffix}`;
+              const current = service[key]
+                ? (typeof service[key] === 'string' ? JSON.parse(service[key]) : service[key])
+                : [];
 
-              if (typeof index === 'number') {
-                // Update specific step
-                if (Array.isArray(currentHowWeWork)) {
-                  const stepValue = value as { title: string; description: string };
-                  if (stepValue && typeof stepValue === 'object') {
-                    currentHowWeWork[index] = stepValue;
-                    await connection.execute(
-                      `UPDATE Service SET ${howWeWorkKey} = ?, updatedAt = NOW() WHERE id = ?`,
-                      [JSON.stringify(currentHowWeWork), serviceId]
-                    );
-                  }
-                }
+              if (typeof index === 'number' && Array.isArray(current)) {
+                const stepValue = value as { title: string; description: string };
+                current[index] = stepValue;
+                await connection.execute(
+                  `UPDATE Service SET ${key} = ?, updatedAt = NOW() WHERE id = ?`,
+                  [JSON.stringify(current), serviceId]
+                );
               }
               break;
+            }
 
             case 'icon':
               await connection.execute(
@@ -152,7 +146,7 @@ export async function POST(request: NextRequest) {
               );
               break;
 
-            case 'order':
+            case 'order': {
               const orderVal = Number(value);
               if (!isNaN(orderVal)) {
                 await connection.execute(
@@ -161,32 +155,36 @@ export async function POST(request: NextRequest) {
                 );
               }
               break;
+            }
 
             case 'isActive': {
-  const isActiveValue = value as unknown;
+              const normalized =
+                value === true ||
+                value === 'true' ||
+                value === '1' ||
+                value === 1;
 
-  const normalizedIsActive =
-    isActiveValue === true ||
-    isActiveValue === 'true' ||
-    isActiveValue === '1' ||
-    isActiveValue === 1;
-
-  await connection.execute(
-    `UPDATE Service SET isActive = ?, updatedAt = NOW() WHERE id = ?`,
-    [normalizedIsActive ? 1 : 0, serviceId]
-  );
-  break;
-}
-
+              await connection.execute(
+                `UPDATE Service SET isActive = ?, updatedAt = NOW() WHERE id = ?`,
+                [normalized ? 1 : 0, serviceId]
+              );
+              break;
+            }
+          }
         }
       }
 
       return NextResponse.json({ success: true });
+
     } finally {
       if (connection) await connection.end();
     }
+
   } catch (error) {
     console.error('Service inline edit error:', error);
-    return NextResponse.json({ success: false, error: 'Failed to save changes' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: 'Failed to save changes' },
+      { status: 500 }
+    );
   }
 }

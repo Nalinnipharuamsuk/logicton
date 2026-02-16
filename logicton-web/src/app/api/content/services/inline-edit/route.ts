@@ -162,14 +162,22 @@ export async function POST(request: NextRequest) {
               }
               break;
 
-            case 'isActive':
-              const isActiveValue = value;
-              await connection.execute(
-                `UPDATE Service SET isActive = ?, updatedAt = NOW() WHERE id = ?`,
-                [isActiveValue === true || isActiveValue === 'true' || isActiveValue === 1 ? 1 : 0, serviceId]
-              );
-              break;
-          }
+            case 'isActive': {
+  const isActiveValue = value as unknown;
+
+  const normalizedIsActive =
+    isActiveValue === true ||
+    isActiveValue === 'true' ||
+    isActiveValue === '1' ||
+    isActiveValue === 1;
+
+  await connection.execute(
+    `UPDATE Service SET isActive = ?, updatedAt = NOW() WHERE id = ?`,
+    [normalizedIsActive ? 1 : 0, serviceId]
+  );
+  break;
+}
+
         }
       }
 

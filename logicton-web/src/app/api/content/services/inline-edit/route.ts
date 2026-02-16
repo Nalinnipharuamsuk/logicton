@@ -158,17 +158,19 @@ export async function POST(request: NextRequest) {
             }
 
             case 'isActive': {
-              const normalized =
-                value === true ||
-                value === 'true' ||
-                value === '1' ||
-                value === 1;
+  const raw = value as unknown;
 
-              await connection.execute(
-                `UPDATE Service SET isActive = ?, updatedAt = NOW() WHERE id = ?`,
-                [normalized ? 1 : 0, serviceId]
-              );
-              break;
+  const normalized =
+    raw === true ||
+    raw === 'true' ||
+    raw === '1' ||
+    raw === 1;
+
+  await connection.execute(
+    `UPDATE Service SET isActive = ?, updatedAt = NOW() WHERE id = ?`,
+    [normalized ? 1 : 0, serviceId]
+  );
+  break;
             }
           }
         }

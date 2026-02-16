@@ -303,19 +303,19 @@ export default function ContactMessagesPage() {
       {/* Message Detail Modal */}
       {selectedInquiry && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedInquiry(null)}
         >
           <div
-            className="bg-card rounded-2xl border border-border max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            className="bg-white rounded-[16px] max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-[0_20px_60px_rgba(0,0,0,0.15)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-border">
+            <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold">Message Details</h3>
+                <h3 className="text-xl font-bold text-[#111827]">Message Details</h3>
                 <button
                   onClick={() => setSelectedInquiry(null)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
                 >
                   ✕
                 </button>
@@ -325,48 +325,48 @@ export default function ContactMessagesPage() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Name</p>
-                  <p className="font-medium">{selectedInquiry.name}</p>
+                  <p className="text-sm text-[#6b7280] mb-1">Name</p>
+                  <p className="font-medium text-[#111827]">{selectedInquiry.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Email</p>
-                  <p className="font-medium">{selectedInquiry.email}</p>
+                  <p className="text-sm text-[#6b7280] mb-1">Email</p>
+                  <p className="font-medium text-[#111827]">{selectedInquiry.email}</p>
                 </div>
                 {selectedInquiry.phone && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Phone</p>
-                    <p className="font-medium">{selectedInquiry.phone}</p>
+                    <p className="text-sm text-[#6b7280] mb-1">Phone</p>
+                    <p className="font-medium text-[#111827]">{selectedInquiry.phone}</p>
                   </div>
                 )}
                 {selectedInquiry.company && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Company</p>
-                    <p className="font-medium">{selectedInquiry.company}</p>
+                    <p className="text-sm text-[#6b7280] mb-1">Company</p>
+                    <p className="font-medium text-[#111827]">{selectedInquiry.company}</p>
                   </div>
                 )}
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Subject</p>
-                <p className="font-medium">{selectedInquiry.subject}</p>
+                <p className="text-sm text-[#6b7280] mb-1">Subject</p>
+                <p className="font-medium text-[#111827]">{selectedInquiry.subject}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Message</p>
-                <p className="font-medium whitespace-pre-wrap bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                <p className="text-sm text-[#6b7280] mb-1">Message</p>
+                <p className="font-medium whitespace-pre-wrap bg-[#f9fafb] border border-[#e5e7eb] p-4 rounded-lg text-[#111827]">
                   {selectedInquiry.message}
                 </p>
               </div>
-              <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border">
+              <div className="flex items-center justify-between text-sm text-[#6b7280] pt-4 border-t border-gray-200">
                 <span>Submitted: {formatDate(selectedInquiry.submittedAt)}</span>
                 <span>IP: {selectedInquiry.ipAddress}</span>
               </div>
             </div>
-            <div className="p-6 border-t border-border flex gap-3">
+            <div className="p-6 border-t border-gray-200 flex gap-3">
               <button
                 onClick={() => {
                   const nextStatus = selectedInquiry.status === 'new' ? 'read' : 'new';
                   handleUpdateStatus(selectedInquiry.id, nextStatus);
                 }}
-                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                className="flex-1 px-4 py-2 bg-[#2563eb] text-white rounded-lg hover:bg-[#1d4ed8] transition-colors font-medium"
               >
                 Mark as {selectedInquiry.status === 'new' ? 'Read' : 'New'}
               </button>
@@ -375,7 +375,7 @@ export default function ContactMessagesPage() {
                   setSelectedInquiry(null);
                   handleDelete(selectedInquiry.id);
                 }}
-                className="px-4 py-2 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors font-medium"
+                className="px-4 py-2 border border-[#ef4444] text-[#ef4444] rounded-lg hover:bg-[#ef4444] hover:text-white transition-colors font-medium"
               >
                 Delete
               </button>

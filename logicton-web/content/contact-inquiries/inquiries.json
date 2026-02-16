@@ -1,5 +1,27 @@
 [
   {
+    "id": "inquiry-1770880871918-7og36zq8c",
+    "name": "test",
+    "email": "test@gmail.com",
+    "subject": "Software Development Inquiry",
+    "message": "test",
+    "language": "en",
+    "submittedAt": "2026-02-12T07:21:11.918Z",
+    "status": "new",
+    "ipAddress": "::1"
+  },
+  {
+    "id": "inquiry-1770865670261-ue2a5f5ib",
+    "name": "jon",
+    "email": "jon@gmail.com",
+    "subject": "Software Development Inquiry",
+    "message": "2323",
+    "language": "en",
+    "submittedAt": "2026-02-12T03:07:50.261Z",
+    "status": "read",
+    "ipAddress": "::1"
+  },
+  {
     "id": "inquiry-1770362543439-rrs2qo4bg",
     "name": "mo",
     "email": "mo@gmail.com",
@@ -128,17 +150,6 @@
     "message": "test test test test test",
     "language": "th",
     "submittedAt": "2026-02-02T04:11:01.361Z",
-    "status": "new",
-    "ipAddress": "::1"
-  },
-  {
-    "id": "inquiry-1770865670261-ue2a5f5ib",
-    "name": "jon",
-    "email": "jon@gmail.com",
-    "subject": "Software Development Inquiry",
-    "message": "2323",
-    "language": "en",
-    "submittedAt": "2026-02-12T03:07:50.261Z",
     "status": "new",
     "ipAddress": "::1"
   }
